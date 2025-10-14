@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app-one
+  name: app-three
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
-      app: app-one
+      app: app-three
   template:
     metadata:
       labels:
-        app: app-one
+        app: app-three
     spec:
       containers:
-        - name: app-one
-          image: tgellon/app-one:latest
+        - name: app-three
+          image: tgellon/app-three:latest
           ports:
           - containerPort: 8080
           readinessProbe:
@@ -28,4 +28,4 @@ spec:
               port: 8080
           env:
             - name: MSG
-              value: "Hello from app1."
+              value: "Hello from app3."
