@@ -10,12 +10,11 @@ It is divided into three parts you have to do in the following order:
 
 ## Some knowledge
 
-xavki - youtube
-techwhale - youtube
-
 ### K3s
 
 K3s is a Kubernetes distribution made by Rancher Labs. It is a lightweight Kubernetes distribution (compared to K8s) that is easy to install and use. Abscence of storage drivers and cloud. Docker needs to be installed if we want to use it.
+
+![alt text](misc/kube_architecture.png)
 
 ### Vagrant
 
@@ -93,11 +92,21 @@ Here, this simple vagrantfile only downloads an ubuntu box (like an image) and i
 
 ## Part 2 : K3s and 3 apps (+ Ingress)
 
+### The 3 apps
+
+There is one cluster containing 3 services, configured to be on the same ip address. The second app has 3 replicas (so 5 pods in total). Here we just need them to display a message saying hi from app x, depending on the host called with the ip. For that, we use Ingress.
+
 ### Ingress
 
 Ingress is an API object that manages external access to the services in a cluster, typically HTTP. Ingress may provide load balancing, SSL termination and name-based virtual hosting.
 
 Ingress exposes HTTP and HTTPS routes from outside the cluster to services within the cluster. Traffic routing is controlled by rules defined on the Ingress resource.
+
+By default, Traefik is the ingress used on k3s, and it is enough for this part.
+
+## Part 3 : K3D
+
+K3d is a lighter version of kubernetes like k3s, but made to use docker containers.
 
 ## Ressources
 
@@ -105,4 +114,12 @@ Xavki - https://www.youtube.com/watch?v=KViZkMialxo&list=PLn6POgpklwWo6wiy2G3SjB
 
 TechWhale - https://www.youtube.com/watch?v=aiquGLWWae4&list=PLCSOT8q0qCLy0p_mwjtAR8FNHcnAGw5mE
 
-https://blog.stephane-robert.info/docs/infra-as-code/provisionnement/vagrant/
+GOAT - https://blog.stephane-robert.info/docs/infra-as-code/provisionnement/vagrant/
+
+Vagrant doc - https://developer.hashicorp.com/vagrant/docs
+
+Kubernetes - https://kubernetes.io/docs/concepts/overview/
+
+K3d and ArgoCD - https://www.sokube.io/en/blog/gitops-on-a-laptop-with-k3d-and-argocd-en
+
+Install k3d - https://technonagib.fr/installer-k3d/
