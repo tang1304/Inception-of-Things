@@ -15,7 +15,7 @@ echo "Password: $(kubectl -n argocd get secret argocd-initial-admin-secret -o js
 # To access the ArgoCD UI ; 'nohup' unlinks the process from terminal ; '&' runs it in background
 nohup kubectl port-forward -n argocd svc/argocd-server 8080:443 > will_argocd.log 2>&1 &
 
-kubectl apply -f ./confs/app_will.yaml
+kubectl apply -f ./confs/app_wil_argoCD.yaml
 
 while ! kubectl get svc playground-service -n dev >/dev/null 2>&1; do
     echo "Waiting for service playground-service..."

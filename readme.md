@@ -142,6 +142,8 @@ ArgoCD is a CD tool for kubernetes, that can pull updated code from Git reposito
 	sudo docker rm -f $(sudo docker ps -aq)
 	# to delete the volumes unused
 	sudo docker volume prune
+	# to delete the cluster xxx
+	sudo k3d cluster delete xxx
 
 https://127.0.0.1:8080/
 
