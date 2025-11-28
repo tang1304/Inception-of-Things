@@ -20,14 +20,17 @@ nohup kubectl port-forward -n argocd svc/argocd-server 8080:443 > will_argocd.lo
 
 echo $'\nInstalling GitLab...\n'
 helm repo add gitlab http://charts.gitlab.io/
-helm install gitlab gitlab/gitlab --namespace gitlab -f ./confs/gitlab_values.yaml
+helm repo update
+helm upgrade --install gitlab gitlab/gitlab --namespace gitlab --set global.edition=ce -f ./confs/gitlab_values.yaml
 
 kubectl wait -n gitlab --for=condition=available deployment/gitlab-webservice-default --timeout=15m 2>/dev/null
 
 kubectl apply -f ./confs/gitlab_ingress.yaml
 
-echo $'GitLab username: root\n'
-echo "Password: $(kubectl get secret -n gitlab gitlab-gitlab-initial-root-password -ojsonpath='{.data.password}' | base64 -d)"
+# Optional
+nohup kubectl port-forward -n gitlab svc/gitlab-webservice-default 8082:8080 > local_gitlab.log 2>&1 &
+
+echo $'\nGitLab installed\n'
 
 # kubectl apply -f ./confs/app_wil_argoCD.yaml
 

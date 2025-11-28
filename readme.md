@@ -165,3 +165,18 @@ K3d and ArgoCD -
 	https://yashguptaa.medium.com/application-deploy-to-kubernetes-with-argo-cd-and-k3d-8e29cf4f83ee
 
 Install k3d - https://technonagib.fr/installer-k3d/
+
+
+gitlab        gitlab-gitaly-0                                    1/1     Running                 1 (24m ago)   29m
+gitlab        gitlab-gitlab-exporter-7bb4fd579b-pn7fq            1/1     Running                 0             29m
+gitlab        gitlab-gitlab-shell-76bc6c5cf9-w6ts7               1/1     Running                 0             29m
+gitlab        gitlab-kas-5cfc97d7b8-tdkgw                        1/1     Running                 2 (24m ago)   29m
+gitlab        gitlab-kas-5cfc97d7b8-w67qm                        1/1     Running                 1 (28m ago)   29m
+gitlab        gitlab-migrations-24aadfe-tdxn6                    0/1     Completed               0             29m
+gitlab        gitlab-minio-659c4cb8c7-mkhz4                      1/1     Running                 0             29m
+gitlab        gitlab-minio-create-buckets-a157622-nw6x8          0/1     Completed               0             29m
+gitlab        gitlab-postgresql-0                                2/2     Running                 2 (24m ago)   29m
+gitlab        gitlab-redis-master-0                              2/2     Running                 0             29m
+gitlab        gitlab-sidekiq-all-in-1-v2-7c585cbffd-f5nkk        1/1     Running                 1 (18m ago)   29m
+gitlab        gitlab-toolbox-c8544c65d-p58fc                     1/1     Running                 0             29m
+gitlab        gitlab-webservice-default-7f978c6bb9-hg2dc         0/2     Init:ImagePullBackOff   1             29m
