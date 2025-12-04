@@ -1,6 +1,6 @@
 #!/bin/bash
 
-GITLAB_URL="http://localhost:8082"
+GITLAB_URL="http://gitlab.local"
 GITLAB_PROJECT_NAME="tgellon_iot_willapp"
 USERNAME="root"
 
@@ -16,14 +16,17 @@ cd $TEMP_DIR
 git clone https://github.com/tang1304/tgellon_IoT_willApp.git
 cd tgellon_IoT_willApp
 
-# Wait for GitLab to be fully ready
-# echo "Waiting for GitLab API to be ready..."
-# sleep 30
+# Check for existing personal access token named 'automation-token'
+echo "Checking for existing GitLab personal access token.."
+TOKEN=$(kubectl exec -n gitlab deployment/gitlab-toolbox -- \
+  gitlab-rails runner "user = User.find_by_username('root'); token = user.personal_access_tokens.find_by(name: 'automation-token'); puts token&.token.to_s" | tr -d '\n\r')
 
-# Create a personal access token
-echo "Creating GitLab personal access token.."
-GITLAB_TOKEN=$(kubectl exec -n gitlab deployment/gitlab-toolbox -- \
-  gitlab-rails runner "token = User.find_by_username('root').personal_access_tokens.create(scopes: [:api, :read_repository, :write_repository], name: 'automation-token', expires_at: 365.days.from_now); token.set_token('glpat-' + SecureRandom.alphanumeric(20)); token.save!; puts token.token")
+
+GITLAB_TOKEN=$(curl -sk --request POST "${GITLAB_URL}/oauth/token" \
+  --form "grant_type=password" \
+  --form "username=${USERNAME}" \
+  --form "password=${GITLAB_PASSWORD}" \
+  --form "scope=api" 2>/dev/null | jq -r '.access_token')
 
 echo 'GitLab token created:'
 echo "$GITLAB_TOKEN"
@@ -42,7 +45,11 @@ echo "Project created with ID: $PROJECT_ID"
 
 # Configure git and push to GitLab
 git remote rename origin github
-git remote add gitlab "http://root:${GITLAB_TOKEN}@localhost:8082/root/${GITLAB_PROJECT_NAME}.git"
+# Use the token as both username and password for GitLab authentication
+git remote add gitlab "http://oauth2:${GITLAB_TOKEN}@iot.local.gitlab/root/${GITLAB_PROJECT_NAME}.git"
+
+# Alternatively, you can use git credential store
+git config --global credential.helper store
 
 # Push to GitLab
 echo "Pushing repository to GitLab..."

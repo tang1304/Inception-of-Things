@@ -32,8 +32,8 @@ sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
 echo $'\nChecking correct installation of kubectl...'
 kubectl version --client
 
-sudo curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
-sudo chmod 700 get_helm.sh
-sudo ./get_helm.sh
-echo $'\nChecking correct installation of helm...'
+echo $'\nInstalling Helm...'
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+
+echo $'\nChecking correct installation of Helm...'
 helm version

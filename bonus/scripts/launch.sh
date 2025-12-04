@@ -2,42 +2,47 @@
 
 # https://dev.to/danielcristho/k3d-getting-started-with-argocd-5c6l
 
-k3d cluster create bonus --agents 1
-kubectl create namespace argocd
-kubectl create namespace dev
-kubectl create namespace gitlab
+k3d cluster create bonus2 --agents 1
 
+kubectl create namespace argocd
+kubectl create namespace gitlab
+kubectl create namespace dev
+
+echo $'\nInstalling ArgoCD...'
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 kubectl wait -n argocd --for=condition=available deployment --all --timeout=3m
 
 # To print the initial password generated for admin user
+echo $'\nArgoCD admin password:'
+kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
 
-echo $'ArgoCD username: admin\n'
-echo "Password: $(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)"
+echo $'\nStarting ArgoCD port-forward on localhost:8080...'
+nohup kubectl port-forward -n argocd svc/argocd-server 8080:443 > argocd.log 2>&1 &
 
-# To access the ArgoCD UI ; 'nohup' unlinks the process from terminal ; '&' runs it in background
-nohup kubectl port-forward -n argocd svc/argocd-server 8080:443 > will_argocd.log 2>&1 &
-
-echo $'\nInstalling GitLab...\n'
-helm repo add gitlab http://charts.gitlab.io/
+echo $'\nAdding GitLab Helm repository...'
+helm repo add gitlab https://charts.gitlab.io/
 helm repo update
-helm upgrade --install gitlab gitlab/gitlab --namespace gitlab --set global.edition=ce -f ./confs/gitlab_values.yaml
 
-kubectl wait -n gitlab --for=condition=available deployment/gitlab-webservice-default --timeout=15m 2>/dev/null
+echo $'\nInstalling GitLab...'
+helm install gitlab gitlab/gitlab --namespace gitlab -f ./confs/gitlab_values.yaml
 
+echo $'\nWaiting for GitLab webservice to be ready...'
+kubectl wait -n gitlab --for=condition=available deployment/gitlab-webservice-default --timeout=15m
+
+echo $'\nApplying GitLab ingress configuration...'
 kubectl apply -f ./confs/gitlab_ingress.yaml
 
-# Optional
-nohup kubectl port-forward -n gitlab svc/gitlab-webservice-default 8082:8080 > local_gitlab.log 2>&1 &
+echo $'\nGetting GitLab root password...'
+echo "GitLab root password:"
+kubectl get secret gitlab-gitlab-initial-root-password -n gitlab -o jsonpath="{.data.password}" | base64 -d
+echo ""
 
-echo $'\nGitLab installed\n'
+echo $'\nStarting GitLab port-forward on localhost:8082...'
+nohup kubectl port-forward -n gitlab svc/gitlab-webservice-default 8082:8181 > gitlab.log 2>&1 &
 
-# kubectl apply -f ./confs/app_wil_argoCD.yaml
-
-# while ! kubectl get svc playground-service -n dev >/dev/null 2>&1; do
-#     echo "Waiting for service playground-service..."
-#     sleep 5
-# done
-
-# kubectl wait -n dev --for=condition=available deployment/playground --timeout=2m 2>/dev/null
-# nohup kubectl port-forward -n dev svc/playground-service 8081:8888 > will_playground.log 2>&1 &
+echo $'\n=== Setup Complete ==='
+echo "ArgoCD UI: https://localhost:8080 (admin / see password above)"
+echo "GitLab UI: http://localhost:8082 (root / see password above)"
+echo ""
+echo "To add gitlab.local to /etc/hosts for internal cluster access:"
+echo "echo '127.0.0.1 gitlab.local' | sudo tee -a /etc/hosts"
