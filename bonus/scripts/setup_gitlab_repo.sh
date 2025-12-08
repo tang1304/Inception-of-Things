@@ -63,15 +63,25 @@ echo "Repository successfully uploaded to GitLab!"
 echo "GitLab project URL: $GITLAB_URL/root/$GITLAB_PROJECT_NAME"
 
 # Add GitLab repository to ArgoCD
+echo "Adding GitLab repository to ArgoCD..."
 GITLAB_INTERNAL_URL="http://gitlab-webservice-default.gitlab.svc.cluster.local:8181"
-REPO_URL="${GITLAB_INTERNAL_URL}/root/tgellon_iot_willapp"
+REPO_URL="${GITLAB_INTERNAL_URL}/root/${GITLAB_PROJECT_NAME}.git"
 
-kubectl exec -n argocd deployment/argocd-server -- \
-  argocd repo add "$REPO_URL" \
+# Get ArgoCD admin password
+ARGOCD_PASSWORD=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
+
+# Login to ArgoCD and add repository
+kubectl exec -n argocd deployment/argocd-server -- bash -c "
+  argocd login argocd-server.argocd.svc.cluster.local:443 \
+    --username admin \
+    --password '$ARGOCD_PASSWORD' \
+    --insecure && \
+  argocd repo add '$REPO_URL' \
     --username root \
-    --password "$GITLAB_TOKEN" \
+    --password '$GITLAB_TOKEN' \
     --insecure-skip-server-verification \
     --upsert
+"
 
 echo "Repository configured successfully!"
 
