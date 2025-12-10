@@ -162,4 +162,3 @@ K3d and ArgoCD -
 	https://yashguptaa.medium.com/application-deploy-to-kubernetes-with-argo-cd-and-k3d-8e29cf4f83ee
 
 Install k3d - https://technonagib.fr/installer-k3d/
-
