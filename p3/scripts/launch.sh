@@ -30,4 +30,4 @@ done
 
 kubectl wait -n dev --for=condition=available deployment/playground --timeout=2m 2>/dev/null
 
-nohup kubectl port-forward -n dev svc/playground-service 8888:8888 > will_playground.log 2>&1 &
+kubectl apply -f ./confs/app-ingress.yaml
